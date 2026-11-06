@@ -30,7 +30,7 @@ radius.
   backends per pipeline kind under `core/src/render/backends/`.
 - `Renderer.cpp` shrinks to a dispatcher (~150 LOC).
 - New header `core/include/dc/cmd/CommandHandlerRegistry.hpp` mirroring
-  GMA's NodeTypeRegistry pattern from gma_v3.
+  krn's NodeTypeRegistry pattern from krn.
 - `CommandProcessor.cpp` shrinks to a dispatcher; each command kind
   gets its own file under `core/src/cmd/handlers/`.
 - New tests:
@@ -83,7 +83,7 @@ radius.
 - **Split each file in two but keep the same architecture** —
   rejected, doesn't actually solve the central-edit problem.
 - **Visitor pattern instead of registry** — possible but registry
-  matches the gma_v3 conventions we just shipped.
+  matches the krn conventions we just shipped.
 
 ## Risks
 - Refactor introduces a subtle behavior diff. Mitigation: 199 existing

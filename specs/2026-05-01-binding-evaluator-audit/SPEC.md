@@ -74,7 +74,7 @@ design is finalized.
   reviewing flags real concerns.
 - **Leave it undocumented** — rejected; failure to communicate intent
   on a 330-LOC subsystem is exactly the kind of drift that bit
-  contract-audit ENC-41/50 in gma_v3.
+  contract-audit ENC-41/50 in krn.
 
 ## Risks
 - Documenting incorrectly entrenches a wrong understanding. Mitigation:

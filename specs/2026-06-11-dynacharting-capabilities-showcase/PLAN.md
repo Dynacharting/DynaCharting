@@ -10,7 +10,7 @@ Demonstrate the breadth of *data-aware* charts DynaCharting can render via a **f
 2. An empirical **frontier report**: per-view native / composed / walled-with-reason — the evidence base for the future "custom-WGSL-pipeline-from-JSON" decision.
 
 ## 2. Non-goals
-Custom-shader-from-JSON; real GMA/forum/feeds/auth/prod hardening; in-engine data mutation (purity preserved — all computation upstream).
+Custom-shader-from-JSON; real krn/forum/feeds/auth/prod hardening; in-engine data mutation (purity preserved — all computation upstream).
 
 ## 3. Qualification results (what changed from v1)
 
@@ -20,7 +20,7 @@ Custom-shader-from-JSON; real GMA/forum/feeds/auth/prod hardening; in-engine dat
 - **A9 ✓** the WASM bundle is current and links **all 10 pipelines** incl. texturedQuad + textSDF (`core/CMakeLists.txt` dc_engine_host target).
 
 **Broke / reframed (the important corrections):**
-- **A4 (was "critical blocker") → MANAGED.** embassy's GMA value path is **scalar-only** (`func(value float32)`; `asFloat32` drops arrays; GMA `ob.*` returns scalars). Vector/L2 views (depth ladder, market profile, footprint) can't ride a single array subscription. **Reframe: because we own the mock, vector data is emitted as a _fan of scalar keys_** (e.g. `depth.bid.0.size … depth.bid.N.size`), routed into one buffer via embassy's **existing compound-join mechanism** (the same path candle6 uses: many subs → one packed record). So these views are **composed, not walled** — they just need a generalized "multi-sub → buffer-slots" mapping (T0.2/T3.3), not new GMA array support.
+- **A4 (was "critical blocker") → MANAGED.** embassy's krn value path is **scalar-only** (`func(value float32)`; `asFloat32` drops arrays; krn `ob.*` returns scalars). Vector/L2 views (depth ladder, market profile, footprint) can't ride a single array subscription. **Reframe: because we own the mock, vector data is emitted as a _fan of scalar keys_** (e.g. `depth.bid.0.size … depth.bid.N.size`), routed into one buffer via embassy's **existing compound-join mechanism** (the same path candle6 uses: many subs → one packed record). So these views are **composed, not walled** — they just need a generalized "multi-sub → buffer-slots" mapping (T0.2/T3.3), not new krn array support.
 - **A3 (partial).** Buffer IDs are **not** specifiable from the instruction file today (legacy path hardcodes `100+index`; recipes own IDs). Fix: add an explicit `bufferId`/slot binding to the instruction file — a small generalization of the recipe mechanism (T0.2 → T3.3).
 - **A6 (escape hatch REACHABLE, needs conductor wiring).** `texturedQuad` is test-proven (`d36_1_dawn_texquad.cpp` via a `TextureSource`), but (a) there is **no JSON command to upload texture pixels** and (b) `dc_engine_host.cpp` doesn't wire a `TextureSource` yet. Fix: add a `TextureSource` impl + Embind `setTexturePixels(id,bytes,w,h,fmt)` to the WASM host (~1–2h, proven). This **rescues weather-radar + the 3 "walled" views** into *composed-via-upstream-precompute* (producer rasterizes the colormap → texture; purity preserved). New ticket T3.6.
 - **A7 (partial).** `EngineProvider` is clean, but `useLiveUpdates` is coupled to `useTenant`/auth. Fix: make `agentDataUrl` an optional param + a standalone `ShowcaseApp` (no auth/tenant) + `VITE_SHOWCASE_AGENT_URL` (T5.0b, ~3h).
@@ -32,7 +32,7 @@ Custom-shader-from-JSON; real GMA/forum/feeds/auth/prod hardening; in-engine dat
 ```
  Mock GMA (Go, promoted from           embassy (no forum)                     DynaCharting/apps/showcase (browser)
  embassy fakeServer)                    EMBASSY_INSTRUCTION_FILE=view.json     ShowcaseApp (no auth)
-  • GMA WS protocol                     EMBASSY_GMA_WS_URL=mock                 • dc-wasm EngineHost (WebGPU)
+  • krn WS protocol                     EMBASSY_GMA_WS_URL=mock                 • dc-wasm EngineHost (WebGPU)
   • replays datasets ~20s        ws     EMBASSY_FORUM_URL=unset          ws     • applyManifest(catalog[view])
   • scalars + scalar-fans for     ───▶  • binary.go packs 13-byte records ───▶  • enqueueData(records)
     vector data (depth/profile)         • multi-sub → buffer slots             • setTexturePixels() for heatmaps
