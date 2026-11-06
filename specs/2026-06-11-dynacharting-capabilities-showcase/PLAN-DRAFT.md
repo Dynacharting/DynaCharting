@@ -15,13 +15,13 @@ Two deliverables:
 ## 2. Non-goals
 
 - Building custom-shader-from-JSON. Walled views are **documented, not rendered**.
-- Real GMA, real forum, real market feeds, auth, production hardening.
+- Real krn, real forum, real market feeds, auth, production hardening.
 - Mutating data in the engine (data purity preserved; all computation upstream in the mock/datasets).
 
 ## 3. Architecture (the confirmed inversion)
 
 ```
- Mock GMA (GMA WS protocol)  →  embassy (no forum)  →  dataplane WS :8001/data  →  Browser showcase (dc-wasm/WebGPU)
+ Mock GMA (krn WS protocol)  →  embassy (no forum)  →  dataplane WS :8001/data  →  Browser showcase (dc-wasm/WebGPU)
  replays datasets as            EMBASSY_INSTRUCTION_FILE   raw 13-byte records       applyControl(manifest catalog)
  {type:update,requestId,value}  EMBASSY_GMA_WS_URL=mock                               enqueueData(records)
  over ~20s                      EMBASSY_FORUM_URL=unset                               setTransform pan/zoom
@@ -29,18 +29,18 @@ Two deliverables:
 ```
 
 - **Manifests live in the showcase** (browser-side catalog of SceneDocuments we author). **embassy is a generic data pump.**
-- **Buffer-ID contract:** each view's manifest declares buffers with specific IDs; the matching embassy instruction file maps GMA subscriptions → those buffer IDs by simple `APPEND`; packed formats (candle6) reuse embassy's existing compound path.
+- **Buffer-ID contract:** each view's manifest declares buffers with specific IDs; the matching embassy instruction file maps krn subscriptions → those buffer IDs by simple `APPEND`; packed formats (candle6) reuse embassy's existing compound path.
 
 ## 4. Load-bearing ASSUMPTIONS to qualify (agents: try to break these)
 
 - **A1.** embassy's `fakeGMA`/`fakeServer` test double can be promoted to a standalone long-running mock GMA with no embassy code change; embassy talks to it unchanged via `EMBASSY_GMA_WS_URL`.
 - **A2.** `EMBASSY_INSTRUCTION_FILE` + `EMBASSY_FORUM_URL` unset lets embassy run forum-less with a static instruction set.
 - **A3.** embassy can stream a **simple subscription → specific buffer ID via APPEND** without a bespoke Go recipe per view (generic per-buffer path). If not, a small embassy addition is in scope (T3.3).
-- **A4.** embassy's GMA value path carries the data each view needs. **RISK:** the gma client value callback is `func(value float32)` — *scalar*. Order-book depth / arrays may not flow. Qualify whether array/L2 values can reach a buffer.
+- **A4.** embassy's krn value path carries the data each view needs. **RISK:** the gma client value callback is `func(value float32)` — *scalar*. Order-book depth / arrays may not flow. Qualify whether array/L2 values can reach a buffer.
 - **A5.** dc-wasm `EngineHost` supports a clean **scene reset** between views (delete cascade) so one engine instance can flip across ~20 manifests.
 - **A6.** The `texturedQuad` pipeline can be fed a **data texture via the ingest/data path** (the escape hatch for heatmaps/spectrograms). Qualify whether a texture's pixels can be supplied from a buffer/manifest or only from a file/CPU-side C++.
 - **A7.** A public, no-auth `/showcase` route can reuse `EngineProvider`/`useLiveUpdates` without the tenant/auth plumbing.
-- **A8.** GMA emits (or the mock can emit) every key the views need: ohlc, vwap, sma_N, ema_N, rsi, macd*, bb_*, volume, ob.* — and synthetic non-equities values.
+- **A8.** krn emits (or the mock can emit) every key the views need: ohlc, vwap, sma_N, ema_N, rsi, macd*, bb_*, volume, ob.* — and synthetic non-equities values.
 - **A9.** Still-frame capture works via Playwright screenshot of the settled frame (we have ~/pw + Chrome x11/Vulkan flags).
 - **A10.** Each composed view's geometry is reachable from the 10 pipelines + 7 vertex formats + transforms + the simple-append buffer model. (Per-view classification to verify in Phase 4 qualification.)
 
@@ -57,9 +57,9 @@ Two deliverables:
 - **T1.3** Dataset inspector/validation (ranges, cadence, completeness).
 
 ### Phase 2 — Mock GMA
-- **T2.1** Promote `fakeGMA` → standalone mock GMA server (subscribe/cancel/update, GMA WS protocol).
+- **T2.1** Promote `fakeGMA` → standalone mock GMA server (subscribe/cancel/update, krn WS protocol).
 - **T2.2** Dataset replay engine: ~20s of value updates at realistic cadence; emit the keys each view needs (precomputed in datasets to preserve purity).
-- **T2.3** Mock fidelity tests: embassy talks to it unchanged; value frames match GMA's shape.
+- **T2.3** Mock fidelity tests: embassy talks to it unchanged; value frames match krn's shape.
 
 ### Phase 3 — embassy showcase harness
 - **T3.1** Instruction files per view + subscription→bufferID mapping (embassy side of the contract).

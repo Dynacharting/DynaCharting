@@ -293,7 +293,7 @@ The canvas dominates (≥65% width); explainer docked right; a thin filmstrip of
 │                                                   │ DATA      AAPL · 1s OHLCV   │
 │                                                   │ PIPELINE  instancedCandle@1 │
 │                                                   │ BUFFERS   700 · 500         │
-│                                                   │ SOURCE    GMA→embassy→WS    │
+│                                                   │ SOURCE    krn→embassy→WS    │
 │                                                   ├────────────────────────────┤
 │   ⏮ ⏯ ━━━━●──────── 0:12/0:20  ↻                   │  ← Prev      Next →         │
 ├───────────────────────────────────────────────────┴────────────────────────────┤

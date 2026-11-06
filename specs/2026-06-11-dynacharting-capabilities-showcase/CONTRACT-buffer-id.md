@@ -33,7 +33,7 @@ Per-view buffer IDs are local to that view's manifest+instruction (the engine is
 ```json
 { "recipe": "showcase-explicit-v1",
   "bindings": [
-    {"slot":"<name>", "requestId":"<gma-req-id>", "bufferId":<u32>,
+    {"slot":"<name>", "requestId":"<krn-req-id>", "bufferId":<u32>,
      "mode":"append|compound|fixed",
      "offset":<u32>,           // mode=fixed: byte offset of this element in the buffer
      "stride":<u32>, "intraOffset":<u32>, "slotBit":<u8>   // mode=compound
